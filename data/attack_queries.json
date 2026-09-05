@@ -1,1 +1,1809 @@
-
+[
+  {
+    "number": 1,
+    "name": "Failed Login Attempts",
+    "keywords": [
+      "failed login attempts",
+      "failed",
+      "login",
+      "attempts"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for failed login attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=auth* \"authentication failure\"\n| stats count by user\n| sort -count",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 2,
+    "name": "Potential Security Threats",
+    "keywords": [
+      "potential security threats",
+      "potential",
+      "security",
+      "threats"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for potential security threats. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST status=200\n| rex field=_raw \"password=(?<password>[^&]+)\"\n| eval password_length=length(password)",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 3,
+    "name": "Linux Privilege Escalation",
+    "keywords": [
+      "linux privilege escalation",
+      "linux",
+      "privilege",
+      "escalation"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Linux Authentication Logs",
+    "description": "Detection template for linux privilege escalation. Review thresholds and field names for your environment.",
+    "query": "sourcetype=linux_secure su*\n| where user!=\"root\" AND user!=\"\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 4,
+    "name": "SSH Brute Force",
+    "keywords": [
+      "ssh brute force",
+      "ssh",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Linux Authentication Logs",
+    "description": "Detection template for ssh brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=linux_secure \"Failed password for\"\n| stats count by src_ip\n| sort -count",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 5,
+    "name": "Successful SSH Login",
+    "keywords": [
+      "successful ssh login",
+      "successful",
+      "ssh",
+      "login"
+    ],
+    "mitre": "T1021.004 - SSH",
+    "category": "Lateral Movement",
+    "log_source": "Linux Authentication Logs",
+    "description": "Detection template for successful ssh login. Review thresholds and field names for your environment.",
+    "query": "sourcetype=linux_secure \"Accepted publickey for\"\n| stats count by src_ip\n| sort -count",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 6,
+    "name": "Unusual Network Traffic",
+    "keywords": [
+      "unusual network traffic",
+      "unusual",
+      "network",
+      "traffic"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for unusual network traffic. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic\n| stats sum(bytes) as total_bytes by src_ip, dest_ip\n| where total_bytes > 1000000",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 7,
+    "name": "Suspicious Processes",
+    "keywords": [
+      "suspicious processes",
+      "suspicious",
+      "processes"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for suspicious processes. Review thresholds and field names for your environment.",
+    "query": "sourcetype=processes\n| search \"lsass.exe\" OR \"svchost.exe\" OR \"explorer.exe\"\n| stats count by user",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 8,
+    "name": "General Brute Force",
+    "keywords": [
+      "general brute force",
+      "general",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for general brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_*\n| stats count by clientip, action\n| where action=\"failure\" AND count>=5",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 9,
+    "name": "Windows Special Privileges",
+    "keywords": [
+      "windows special privileges",
+      "windows",
+      "special",
+      "privileges"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for windows special privileges. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4672\n| eval user_account=mvindex(Account_Name,1)",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 10,
+    "name": "Abnormal User Activity",
+    "keywords": [
+      "abnormal user activity",
+      "abnormal",
+      "user",
+      "activity"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for abnormal user activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=purchase\n| stats count by clientip, user\n| where count > 50",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 11,
+    "name": "Potential DNS Tunneling",
+    "keywords": [
+      "potential dns tunneling",
+      "potential",
+      "dns",
+      "tunneling"
+    ],
+    "mitre": "T1071.004 - DNS",
+    "category": "Command and Control / Exfiltration",
+    "log_source": "DNS Logs",
+    "description": "Detection template for potential dns tunneling. Review thresholds and field names for your environment.",
+    "query": "sourcetype=dns\n| stats count by query\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 12,
+    "name": "Suspicious PowerShell Activity",
+    "keywords": [
+      "suspicious powershell activity",
+      "suspicious",
+      "powershell",
+      "activity"
+    ],
+    "mitre": "T1059.001 - PowerShell",
+    "category": "Execution",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for suspicious powershell activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\" EventCode=4103\n| eval script_block=_raw",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 13,
+    "name": "Unusual File Access",
+    "keywords": [
+      "unusual file access",
+      "unusual",
+      "file",
+      "access"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for unusual file access. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* (action=file_delete OR action=file_rename)\n| stats count by user",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 14,
+    "name": "Network Port Scans",
+    "keywords": [
+      "network port scans",
+      "network",
+      "port",
+      "scans"
+    ],
+    "mitre": "T1046 - Network Service Discovery",
+    "category": "Discovery",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for network port scans. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic\n| stats count by src_ip, dest_port\n| where count > 100",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 15,
+    "name": "Suspicious Email Activity",
+    "keywords": [
+      "suspicious email activity",
+      "suspicious",
+      "email",
+      "activity"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Email / Mail Logs",
+    "description": "Detection template for suspicious email activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=email\n| search \"phishing\" OR \"malware\" OR \"suspicious link\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 16,
+    "name": "Data Exfiltration",
+    "keywords": [
+      "data exfiltration",
+      "data",
+      "exfiltration"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for data exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_download\n| stats count by user, dest_ip, dest_port",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 17,
+    "name": "Failed VPN Attempts",
+    "keywords": [
+      "failed vpn attempts",
+      "failed",
+      "vpn",
+      "attempts"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for failed vpn attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* VPN AND action=\"failure\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 18,
+    "name": "Successful VPN Attempts",
+    "keywords": [
+      "successful vpn attempts",
+      "successful",
+      "vpn",
+      "attempts"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for successful vpn attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* VPN AND action=\"success\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 19,
+    "name": "Logins From New or Unknown IPs",
+    "keywords": [
+      "logins from new or unknown ips",
+      "logins",
+      "from",
+      "new",
+      "or",
+      "unknown",
+      "ips"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for logins from new or unknown ips. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=login\n| stats count by user, src_ip\n| where count=1",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 20,
+    "name": "Potential SQL Injection Attempts",
+    "keywords": [
+      "potential sql injection attempts",
+      "potential",
+      "sql",
+      "injection",
+      "attempts"
+    ],
+    "mitre": "T1190 - Exploit Public-Facing Application",
+    "category": "Initial Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for potential sql injection attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST\n| rex field=_raw \"SELECT\\s+(?<query>[^;]+)\"\n| eval query_length=length(query)",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 21,
+    "name": "Unusual File Extensions",
+    "keywords": [
+      "unusual file extensions",
+      "unusual",
+      "file",
+      "extensions"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for unusual file extensions. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_upload\n| rex field=file_path \".*\\.(?<ext>[^\\.]+)\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 22,
+    "name": "Potential Phishing Attacks",
+    "keywords": [
+      "potential phishing attacks",
+      "potential",
+      "phishing",
+      "attacks"
+    ],
+    "mitre": "T1566 - Phishing",
+    "category": "Initial Access",
+    "log_source": "Email / Mail Logs",
+    "description": "Detection template for potential phishing attacks. Review thresholds and field names for your environment.",
+    "query": "sourcetype=email\n| search \"password\" OR \"reset\" OR \"verify\" OR \"login\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 23,
+    "name": "Traffic to Known Malicious IPs",
+    "keywords": [
+      "traffic to known malicious ips",
+      "traffic",
+      "to",
+      "known",
+      "malicious",
+      "ips"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for traffic to known malicious ips. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic dest_ip=malicious_ip",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 24,
+    "name": "Unusual Login Times",
+    "keywords": [
+      "unusual login times",
+      "unusual",
+      "login",
+      "times"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for unusual login times. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=login\n| eval hour=strftime(_time,\"%H\")\n| stats count by user, hour\n| where count < 3",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 25,
+    "name": "Privilege Escalation via sudo",
+    "keywords": [
+      "privilege escalation via sudo",
+      "privilege",
+      "escalation",
+      "via",
+      "sudo"
+    ],
+    "mitre": "T1548.003 - Sudo and Sudo Caching",
+    "category": "Privilege Escalation",
+    "log_source": "Linux Authentication Logs",
+    "description": "Detection template for privilege escalation via sudo. Review thresholds and field names for your environment.",
+    "query": "sourcetype=linux_secure \"sudo:\"\n| where user!=\"root\" AND user!=\"\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 26,
+    "name": "Brute Force on Specific User",
+    "keywords": [
+      "brute force on specific user",
+      "brute",
+      "force",
+      "on",
+      "specific",
+      "user"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for brute force on specific user. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* user=username AND action=failure\n| stats count by src_ip\n| where count >= 5",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 27,
+    "name": "Unusual DNS Requests",
+    "keywords": [
+      "unusual dns requests",
+      "unusual",
+      "dns",
+      "requests"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "DNS Logs",
+    "description": "Detection template for unusual dns requests. Review thresholds and field names for your environment.",
+    "query": "sourcetype=dns\n| stats count by query\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 28,
+    "name": "Spear-Phishing Attempts",
+    "keywords": [
+      "spear-phishing attempts",
+      "spear phishing attempts",
+      "spear-phishing",
+      "attempts"
+    ],
+    "mitre": "T1566 - Phishing",
+    "category": "Initial Access",
+    "log_source": "Email / Mail Logs",
+    "description": "Detection template for spear-phishing attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=email\n| search \"CEO\" OR \"CFO\" OR \"Finance\" OR \"Accounting\" OR \"Payment\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 29,
+    "name": "Potential Malware Downloads",
+    "keywords": [
+      "potential malware downloads",
+      "potential",
+      "malware",
+      "downloads"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for potential malware downloads. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_download\n| rex field=file_path \".*\\.(?<ext>[^\\.]+)\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 30,
+    "name": "Unusual Purchase Activity",
+    "keywords": [
+      "unusual purchase activity",
+      "unusual",
+      "purchase",
+      "activity"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for unusual purchase activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=purchase\n| stats count by user\n| where count > 100",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 31,
+    "name": "Potential DDoS Attacks",
+    "keywords": [
+      "potential ddos attacks",
+      "potential",
+      "ddos",
+      "attacks"
+    ],
+    "mitre": "T1498 - Network Denial of Service",
+    "category": "Impact",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for potential ddos attacks. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic\n| stats sum(bytes) as total_bytes by src_ip\n| where total_bytes > 100000000",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 32,
+    "name": "Ransomware Activity",
+    "keywords": [
+      "ransomware activity",
+      "ransomware",
+      "activity"
+    ],
+    "mitre": "T1486 - Data Encrypted for Impact",
+    "category": "Impact",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for ransomware activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_delete\n| rex field=file_path \".*\\.(?<ext>[^\\.]+)\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 33,
+    "name": "Insider Threat Activity",
+    "keywords": [
+      "insider threat activity",
+      "insider",
+      "threat",
+      "activity"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for insider threat activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_upload\n| stats count by user, file_path\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 34,
+    "name": "Authentication From Unknown IPs",
+    "keywords": [
+      "authentication from unknown ips",
+      "authentication",
+      "from",
+      "unknown",
+      "ips"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for authentication from unknown ips. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=login\n| stats count by src_ip\n| where count >= 5\n| where NOT cidrmatch(\"10.0.0.0/8\",src_ip)",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 35,
+    "name": "Brute Force on SSH Service",
+    "keywords": [
+      "brute force on ssh service",
+      "brute",
+      "force",
+      "on",
+      "ssh",
+      "service"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for brute force on ssh service. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic service=ssh\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 36,
+    "name": "SSH From Unusual Countries",
+    "keywords": [
+      "ssh from unusual countries",
+      "ssh",
+      "from",
+      "unusual",
+      "countries"
+    ],
+    "mitre": "T1021.004 - SSH",
+    "category": "Lateral Movement",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for ssh from unusual countries. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=login service=ssh\n| iplocation src_ip\n| stats count by Country",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 37,
+    "name": "CVE Exploit Attempts",
+    "keywords": [
+      "cve exploit attempts",
+      "cve",
+      "exploit",
+      "attempts"
+    ],
+    "mitre": "T1190 - Exploit Public-Facing Application",
+    "category": "Initial Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for cve exploit attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST\n| rex field=_raw \"(?<exploit>CVE-\\d{4}-\\d+)\"\n| stats count by exploit",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 38,
+    "name": "Targeted User Brute Force",
+    "keywords": [
+      "targeted user brute force",
+      "targeted",
+      "user",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for targeted user brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* user=username action=failure\n| stats count by src_ip\n| where count >= 5",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 39,
+    "name": "Potential MITM Activity",
+    "keywords": [
+      "potential mitm activity",
+      "potential",
+      "mitm",
+      "activity"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for potential mitm activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic protocol=tcp\n| stats count by dest_ip\n| where count > 100",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 40,
+    "name": "Data Exfiltration via Upload",
+    "keywords": [
+      "data exfiltration via upload",
+      "data",
+      "exfiltration",
+      "via",
+      "upload"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for data exfiltration via upload. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_upload\n| stats count by user, file_path\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 41,
+    "name": "Windows Ransomware File Activity",
+    "keywords": [
+      "windows ransomware file activity",
+      "windows",
+      "ransomware",
+      "file",
+      "activity"
+    ],
+    "mitre": "T1486 - Data Encrypted for Impact",
+    "category": "Impact",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for windows ransomware file activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4663\n| stats count by Object_Name, Account_Name",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 42,
+    "name": "Unusual Network Traffic Patterns",
+    "keywords": [
+      "unusual network traffic patterns",
+      "unusual",
+      "network",
+      "traffic",
+      "patterns"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for unusual network traffic patterns. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic\n| stats count by dest_ip, dest_port\n| where count > 100 AND dest_ip!=\"192.168.0.1\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 43,
+    "name": "HTTP Brute Force",
+    "keywords": [
+      "http brute force",
+      "http",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for http brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic protocol=http\n| stats count by src_ip\n| where count >= 50",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 44,
+    "name": "Account Takeover Attempts",
+    "keywords": [
+      "account takeover attempts",
+      "account",
+      "takeover",
+      "attempts"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for account takeover attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=login\n| stats count by user\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 45,
+    "name": "DNS Tunneling - Long Labels",
+    "keywords": [
+      "dns tunneling - long labels",
+      "dns tunneling   long labels",
+      "dns",
+      "tunneling",
+      "-",
+      "long",
+      "labels"
+    ],
+    "mitre": "T1071.004 - DNS",
+    "category": "Command and Control / Exfiltration",
+    "log_source": "DNS Logs",
+    "description": "Detection template for dns tunneling - long labels. Review thresholds and field names for your environment.",
+    "query": "sourcetype=dns\n| eval query_len=len(query)\n| stats count avg(query_len) as avg_len by src_ip\n| where count > 5 AND avg_len > 50",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 46,
+    "name": "SQL Injection on PHP",
+    "keywords": [
+      "sql injection on php",
+      "sql",
+      "injection",
+      "on",
+      "php"
+    ],
+    "mitre": "T1190 - Exploit Public-Facing Application",
+    "category": "Initial Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for sql injection on php. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| search _raw=\"*SELECT*\" OR _raw=\"*UNION*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 47,
+    "name": "Brute Force on Specific Domain",
+    "keywords": [
+      "brute force on specific domain",
+      "brute",
+      "force",
+      "on",
+      "specific",
+      "domain"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for brute force on specific domain. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* host=example.com action=failure\n| stats count by src_ip\n| where count>=10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 48,
+    "name": "Brute Force on App Login",
+    "keywords": [
+      "brute force on app login",
+      "brute",
+      "force",
+      "on",
+      "app",
+      "login"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for brute force on app login. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* uri_path=\"/app/login\" action=failure\n| stats count by src_ip\n| where count>=10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 49,
+    "name": "Phishing Email Attachments",
+    "keywords": [
+      "phishing email attachments",
+      "phishing",
+      "email",
+      "attachments"
+    ],
+    "mitre": "T1566 - Phishing",
+    "category": "Initial Access",
+    "log_source": "Email / Mail Logs",
+    "description": "Detection template for phishing email attachments. Review thresholds and field names for your environment.",
+    "query": "sourcetype=email\n| search attachment=\"*.exe\" OR attachment=\"*.zip\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 50,
+    "name": "Vulnerable Service Exploitation",
+    "keywords": [
+      "vulnerable service exploitation",
+      "vulnerable",
+      "service",
+      "exploitation"
+    ],
+    "mitre": "T1190 - Exploit Public-Facing Application",
+    "category": "Initial Access",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for vulnerable service exploitation. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic\n| stats count by src_ip, dest_port\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 51,
+    "name": "Reconnaissance Activity",
+    "keywords": [
+      "reconnaissance activity",
+      "reconnaissance",
+      "activity"
+    ],
+    "mitre": "T1046 - Network Service Discovery",
+    "category": "Discovery",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for reconnaissance activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=GET\n| stats count by src_ip, uri_path\n| where count > 100",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 52,
+    "name": "XSS Attempts",
+    "keywords": [
+      "xss attempts",
+      "xss",
+      "attempts"
+    ],
+    "mitre": "T1190 - Exploit Public-Facing Application",
+    "category": "Initial Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for xss attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST\n| search _raw=\"*<script*\" OR _raw=\"*javascript:*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 53,
+    "name": "Privilege Escalation Events",
+    "keywords": [
+      "privilege escalation events",
+      "privilege",
+      "escalation",
+      "events"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for privilege escalation events. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=privilege_escalation\n| stats count by user\n| where count > 5",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 54,
+    "name": "Web Application Attacks",
+    "keywords": [
+      "web application attacks",
+      "web",
+      "application",
+      "attacks"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for web application attacks. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST\n| search _raw=\"*sql_injection*\" OR _raw=\"*xss*\" OR _raw=\"*csrf*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 55,
+    "name": "SMB Lateral Movement",
+    "keywords": [
+      "smb lateral movement",
+      "smb",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "T1021.002 - SMB/Windows Admin Shares",
+    "category": "Lateral Movement",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for smb lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic protocol=tcp dest_port=445\n| stats count by src_ip, dest_ip\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 56,
+    "name": "Unauthorized File Changes",
+    "keywords": [
+      "unauthorized file changes",
+      "unauthorized",
+      "file",
+      "changes"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for unauthorized file changes. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_write\n| search file_path=\"*/etc/*\" OR file_path=\"*/var/*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 57,
+    "name": "Port Scanning",
+    "keywords": [
+      "port scanning",
+      "port",
+      "scanning"
+    ],
+    "mitre": "T1046 - Network Service Discovery",
+    "category": "Discovery",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for port scanning. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic protocol=tcp\n| stats dc(dest_port) as unique_ports by src_ip\n| where unique_ports > 20",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 58,
+    "name": "Malicious PowerShell Downloads",
+    "keywords": [
+      "malicious powershell downloads",
+      "malicious",
+      "powershell",
+      "downloads"
+    ],
+    "mitre": "T1059.001 - PowerShell",
+    "category": "Execution",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for malicious powershell downloads. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\" EventCode=4104\n| search ScriptBlockText=\"*DownloadString*\" OR ScriptBlockText=\"*Invoke-WebRequest*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 59,
+    "name": "Long SQL Injection Queries",
+    "keywords": [
+      "long sql injection queries",
+      "long",
+      "sql",
+      "injection",
+      "queries"
+    ],
+    "mitre": "T1190 - Exploit Public-Facing Application",
+    "category": "Initial Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for long sql injection queries. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| eval request_len=len(_raw)\n| search _raw=\"*SELECT*\" OR _raw=\"*UNION*\"\n| where request_len > 500",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 60,
+    "name": "Domain Controller Brute Force",
+    "keywords": [
+      "domain controller brute force",
+      "domain",
+      "controller",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for domain controller brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4625 host=\"DC01\"\n| stats count by src_ip\n| where count>=10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 61,
+    "name": "DDoS Connection Count",
+    "keywords": [
+      "ddos connection count",
+      "ddos",
+      "connection",
+      "count"
+    ],
+    "mitre": "T1498 - Network Denial of Service",
+    "category": "Impact",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for ddos connection count. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic\n| stats count by src_ip\n| where count > 1000",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 62,
+    "name": "Web Shell Activity",
+    "keywords": [
+      "web shell activity",
+      "web",
+      "shell",
+      "activity"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for web shell activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=command_execution\n| search _raw=\"*base64_decode*\" OR _raw=\"*eval(*\" OR _raw=\"*gzinflate*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 63,
+    "name": "Cisco ASA Brute Force",
+    "keywords": [
+      "cisco asa brute force",
+      "cisco",
+      "asa",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for cisco asa brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=cisco:asa\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 64,
+    "name": "Repeated sudo Activity",
+    "keywords": [
+      "repeated sudo activity",
+      "repeated",
+      "sudo",
+      "activity"
+    ],
+    "mitre": "T1548.003 - Sudo and Sudo Caching",
+    "category": "Privilege Escalation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for repeated sudo activity. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=\"sudo command\"\n| stats count by user\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 65,
+    "name": "Advanced DNS Tunneling",
+    "keywords": [
+      "advanced dns tunneling",
+      "advanced",
+      "dns",
+      "tunneling"
+    ],
+    "mitre": "T1071.004 - DNS",
+    "category": "Command and Control / Exfiltration",
+    "log_source": "DNS Logs",
+    "description": "Detection template for advanced dns tunneling. Review thresholds and field names for your environment.",
+    "query": "sourcetype=dns\n| eval query_len=len(query)\n| stats count avg(query_len) as avg_len dc(query) as unique_queries by src_ip\n| where count>50 AND avg_len>50",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 66,
+    "name": "RDP Lateral Movement",
+    "keywords": [
+      "rdp lateral movement",
+      "rdp",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "T1021.001 - Remote Desktop Protocol",
+    "category": "Lateral Movement",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for rdp lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" (EventCode=4624 OR EventCode=4625) Logon_Type=10\n| stats count by src_ip, Account_Name, EventCode",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 67,
+    "name": "Potential C2 Traffic",
+    "keywords": [
+      "potential c2 traffic",
+      "potential",
+      "c2",
+      "traffic"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for potential c2 traffic. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic\n| stats count by src_ip, dest_ip\n| where count > 500",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 68,
+    "name": "PowerShell Empire Indicators",
+    "keywords": [
+      "powershell empire indicators",
+      "powershell",
+      "empire",
+      "indicators"
+    ],
+    "mitre": "T1059.001 - PowerShell",
+    "category": "Execution",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for powershell empire indicators. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\"\n| search _raw=\"*-nop*\" _raw=\"*-w hidden*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 69,
+    "name": "Ransomware File Extensions",
+    "keywords": [
+      "ransomware file extensions",
+      "ransomware",
+      "file",
+      "extensions"
+    ],
+    "mitre": "T1486 - Data Encrypted for Impact",
+    "category": "Impact",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for ransomware file extensions. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_write\n| search file_path=\"*.crypt\" OR file_path=\"*.locky\" OR file_path=\"*.locked\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 70,
+    "name": "Traffic From Suspicious IP",
+    "keywords": [
+      "traffic from suspicious ip",
+      "traffic",
+      "from",
+      "suspicious",
+      "ip"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for traffic from suspicious ip. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic src_ip=10.1.1.1\n| stats count by dest_ip\n| where count > 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 71,
+    "name": "Web App POST Brute Force",
+    "keywords": [
+      "web app post brute force",
+      "web",
+      "app",
+      "post",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for web app post brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| stats count by src_ip\n| where count >= 50",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 72,
+    "name": "Sensitive File Access",
+    "keywords": [
+      "sensitive file access",
+      "sensitive",
+      "file",
+      "access"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for sensitive file access. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_read\n| search file_path=\"*/etc/shadow\" OR file_path=\"*/etc/passwd\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 73,
+    "name": "SMB Admin Share Access",
+    "keywords": [
+      "smb admin share access",
+      "smb",
+      "admin",
+      "share",
+      "access"
+    ],
+    "mitre": "T1021.002 - SMB/Windows Admin Shares",
+    "category": "Lateral Movement",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for smb admin share access. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=5140\n| search Share_Name=\"*ADMIN$*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 74,
+    "name": "Invalid SSH Brute Force",
+    "keywords": [
+      "invalid ssh brute force",
+      "invalid",
+      "ssh",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Linux Authentication Logs",
+    "description": "Detection template for invalid ssh brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=linux_secure action=invalid\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 75,
+    "name": "Phishing Form Submissions",
+    "keywords": [
+      "phishing form submissions",
+      "phishing",
+      "form",
+      "submissions"
+    ],
+    "mitre": "T1566 - Phishing",
+    "category": "Initial Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for phishing form submissions. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| search form_action=\"http://evilsite.com/login\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 76,
+    "name": "Command Injection Attempts",
+    "keywords": [
+      "command injection attempts",
+      "command",
+      "injection",
+      "attempts"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for command injection attempts. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| search _raw=\"*;cat *\" OR _raw=\"*;ls *\" OR _raw=\"*&& whoami*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 77,
+    "name": "WinRM Lateral Movement",
+    "keywords": [
+      "winrm lateral movement",
+      "winrm",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for winrm lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Microsoft-Windows-WinRM/Operational\"\n| search _raw=\"*winrs*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 78,
+    "name": "WordPress Login Brute Force",
+    "keywords": [
+      "wordpress login brute force",
+      "wordpress",
+      "login",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for wordpress login brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"*/wp-login.php\"\n| stats count by src_ip\n| where count >= 20",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 79,
+    "name": "Privilege Escalation via runas",
+    "keywords": [
+      "privilege escalation via runas",
+      "privilege",
+      "escalation",
+      "via",
+      "runas"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for privilege escalation via runas. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4688\n| search New_Process_Name=\"*\\\\runas.exe\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 80,
+    "name": "Beaconing From Compromised Host",
+    "keywords": [
+      "beaconing from compromised host",
+      "beaconing",
+      "from",
+      "compromised",
+      "host"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Network Traffic Logs",
+    "description": "Detection template for beaconing from compromised host. Review thresholds and field names for your environment.",
+    "query": "sourcetype=network_traffic src_ip=10.1.1.1\n| stats count by dest_ip, dest_port\n| where count > 1000",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 81,
+    "name": "Failed SSH Brute Force",
+    "keywords": [
+      "failed ssh brute force",
+      "failed",
+      "ssh",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Linux Authentication Logs",
+    "description": "Detection template for failed ssh brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=linux_secure action=failed\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 82,
+    "name": "HTTP Data Exfiltration",
+    "keywords": [
+      "http data exfiltration",
+      "http",
+      "data",
+      "exfiltration"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for http data exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_download\n| search uri_path=\"*.zip\" OR uri_path=\"*.rar\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 83,
+    "name": "WMI Lateral Movement",
+    "keywords": [
+      "wmi lateral movement",
+      "wmi",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "T1047 - Windows Management Instrumentation",
+    "category": "Execution / Lateral Movement",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for wmi lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Microsoft-Windows-WMI-Activity/Operational\"\n| search Operation=\"ExecQuery\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 84,
+    "name": "MSSQL Brute Force",
+    "keywords": [
+      "mssql brute force",
+      "mssql",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Database Authentication Logs",
+    "description": "Detection template for mssql brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=mssql_access action=failed\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 85,
+    "name": "PowerShell Privilege Escalation",
+    "keywords": [
+      "powershell privilege escalation",
+      "powershell",
+      "privilege",
+      "escalation"
+    ],
+    "mitre": "T1059.001 - PowerShell",
+    "category": "Execution",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for powershell privilege escalation. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\" EventCode=400\n| search _raw=\"*PowerShell*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 86,
+    "name": "Email Account Brute Force",
+    "keywords": [
+      "email account brute force",
+      "email",
+      "account",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Email / Mail Logs",
+    "description": "Detection template for email account brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=exchangeps\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 87,
+    "name": "Successful RDP Lateral Movement",
+    "keywords": [
+      "successful rdp lateral movement",
+      "successful",
+      "rdp",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "T1021.001 - Remote Desktop Protocol",
+    "category": "Lateral Movement",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for successful rdp lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4624 Logon_Type=10\n| stats count by src_ip, Account_Name",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 88,
+    "name": "Successful MSSQL Authentication",
+    "keywords": [
+      "successful mssql authentication",
+      "successful",
+      "mssql",
+      "authentication"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Database Authentication Logs",
+    "description": "Detection template for successful mssql authentication. Review thresholds and field names for your environment.",
+    "query": "sourcetype=mssql_access action=success\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 89,
+    "name": "FTP or SFTP Exfiltration",
+    "keywords": [
+      "ftp or sftp exfiltration",
+      "ftp",
+      "or",
+      "sftp",
+      "exfiltration"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "FTP Logs",
+    "description": "Detection template for ftp or sftp exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* action=file_upload\n| search uri_path=\"*/ftp*\" OR uri_path=\"*/sftp*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 90,
+    "name": "Successful SMB Admin Share Access",
+    "keywords": [
+      "successful smb admin share access",
+      "successful",
+      "smb",
+      "admin",
+      "share",
+      "access"
+    ],
+    "mitre": "T1021.002 - SMB/Windows Admin Shares",
+    "category": "Lateral Movement",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for successful smb admin share access. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=5140\n| search Share_Name=\"*ADMIN$*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 91,
+    "name": "RDP Brute Force",
+    "keywords": [
+      "rdp brute force",
+      "rdp",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for rdp brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4625 Logon_Type=10\n| stats count by src_ip, Account_Name\n| where count>=10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 92,
+    "name": "High-Volume Web Attack",
+    "keywords": [
+      "high-volume web attack",
+      "high volume web attack",
+      "high-volume",
+      "web",
+      "attack"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for high-volume web attack. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST\n| stats count by src_ip, uri_path\n| where count >= 100",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 93,
+    "name": "Remote Registry Lateral Movement",
+    "keywords": [
+      "remote registry lateral movement",
+      "remote",
+      "registry",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for remote registry lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4663\n| search Object_Name=\"*\\\\REGISTRY\\\\MACHINE\\\\SOFTWARE*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 94,
+    "name": "Linux sudo Privilege Escalation",
+    "keywords": [
+      "linux sudo privilege escalation",
+      "linux",
+      "sudo",
+      "privilege",
+      "escalation"
+    ],
+    "mitre": "T1548.003 - Sudo and Sudo Caching",
+    "category": "Privilege Escalation",
+    "log_source": "Linux Authentication Logs",
+    "description": "Detection template for linux sudo privilege escalation. Review thresholds and field names for your environment.",
+    "query": "sourcetype=linux_secure \"sudo:\"\n| stats count by user, host",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 95,
+    "name": "DNS Data Exfiltration",
+    "keywords": [
+      "dns data exfiltration",
+      "dns",
+      "data",
+      "exfiltration"
+    ],
+    "mitre": "T1071.004 - DNS",
+    "category": "Command and Control / Exfiltration",
+    "log_source": "DNS Logs",
+    "description": "Detection template for dns data exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=dns query_type=A\n| search NOT query=\"*.google.com\" NOT query=\"*.microsoft.com\"\n| stats count dc(query) as unique_queries by src_ip",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 96,
+    "name": "Failed SMB Lateral Movement",
+    "keywords": [
+      "failed smb lateral movement",
+      "failed",
+      "smb",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "T1021.002 - SMB/Windows Admin Shares",
+    "category": "Lateral Movement",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for failed smb lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=5152\n| search _raw=\"*ADMIN$*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 97,
+    "name": "Failed MSSQL Brute Force",
+    "keywords": [
+      "failed mssql brute force",
+      "failed",
+      "mssql",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Database Authentication Logs",
+    "description": "Detection template for failed mssql brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=mssql_access action=failed\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 98,
+    "name": "SMTP Data Exfiltration",
+    "keywords": [
+      "smtp data exfiltration",
+      "smtp",
+      "data",
+      "exfiltration"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Email / Mail Logs",
+    "description": "Detection template for smtp data exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=smtp action=send_message\n| search NOT recipient=\"*@gmail.com\" NOT recipient=\"*@yahoo.com\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 99,
+    "name": "NetBIOS Lateral Movement",
+    "keywords": [
+      "netbios lateral movement",
+      "netbios",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for netbios lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:System\" EventCode=5719\n| search _raw=\"*No Domain Controller is available*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 100,
+    "name": "Telnet Brute Force",
+    "keywords": [
+      "telnet brute force",
+      "telnet",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for telnet brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* uri_path=\"*/telnet\"\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 101,
+    "name": "FTP Data Exfiltration",
+    "keywords": [
+      "ftp data exfiltration",
+      "ftp",
+      "data",
+      "exfiltration"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "FTP Logs",
+    "description": "Detection template for ftp data exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=ftp action=putfile\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 102,
+    "name": "Failed WMI Lateral Movement",
+    "keywords": [
+      "failed wmi lateral movement",
+      "failed",
+      "wmi",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "T1047 - Windows Management Instrumentation",
+    "category": "Execution / Lateral Movement",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for failed wmi lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=5605\n| search Object_Name=\"*\\\\ROOT\\\\CIMV2*\" AND User!=\"SYSTEM\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 103,
+    "name": "SSH Endpoint Brute Force",
+    "keywords": [
+      "ssh endpoint brute force",
+      "ssh",
+      "endpoint",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for ssh endpoint brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"*/ssh\"\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 104,
+    "name": "Service Configuration Privilege Escalation",
+    "keywords": [
+      "service configuration privilege escalation",
+      "service",
+      "configuration",
+      "privilege",
+      "escalation"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for service configuration privilege escalation. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" (EventCode=4697 OR EventCode=7045)\n| search Image_Path=\"*\\\\System32\\\\*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 105,
+    "name": "SNMP Brute Force",
+    "keywords": [
+      "snmp brute force",
+      "snmp",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for snmp brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=snmptrap\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 106,
+    "name": "HTTP Upload Data Exfiltration",
+    "keywords": [
+      "http upload data exfiltration",
+      "http",
+      "upload",
+      "data",
+      "exfiltration"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for http upload data exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=access_* method=POST uri_path=\"/upload\"\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 107,
+    "name": "Failed DCOM Lateral Movement",
+    "keywords": [
+      "failed dcom lateral movement",
+      "failed",
+      "dcom",
+      "lateral",
+      "movement"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for failed dcom lateral movement. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:System\" EventCode=10009\n| search _raw=\"*DCOM was unable to communicate*\"",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 108,
+    "name": "MySQL Brute Force",
+    "keywords": [
+      "mysql brute force",
+      "mysql",
+      "brute",
+      "force"
+    ],
+    "mitre": "T1110 - Brute Force",
+    "category": "Credential Access",
+    "log_source": "Database Authentication Logs",
+    "description": "Detection template for mysql brute force. Review thresholds and field names for your environment.",
+    "query": "sourcetype=mysql_access action=failed\n| stats count by src_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 109,
+    "name": "Scheduled Task Privilege Escalation",
+    "keywords": [
+      "scheduled task privilege escalation",
+      "scheduled",
+      "task",
+      "privilege",
+      "escalation"
+    ],
+    "mitre": "T1053.005 - Scheduled Task",
+    "category": "Privilege Escalation / Persistence",
+    "log_source": "Windows Event Logs",
+    "description": "Detection template for scheduled task privilege escalation. Review thresholds and field names for your environment.",
+    "query": "sourcetype=\"WinEventLog:Security\" EventCode=4698\n| stats count by SubjectUserName, TaskName",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  },
+  {
+    "number": 110,
+    "name": "HTTPS Data Exfiltration",
+    "keywords": [
+      "https data exfiltration",
+      "https",
+      "data",
+      "exfiltration"
+    ],
+    "mitre": "Environment Dependent",
+    "category": "Detection / Investigation",
+    "log_source": "Application / Access Logs",
+    "description": "Detection template for https data exfiltration. Review thresholds and field names for your environment.",
+    "query": "sourcetype=ssl method=POST\n| stats count by src_ip, dest_ip\n| where count >= 10",
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+  }
+]
