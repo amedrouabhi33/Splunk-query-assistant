@@ -8,12 +8,37 @@
       "login",
       "attempts"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1110 - Brute Force",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for failed login attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=auth* \"authentication failure\"\n| stats count by user\n| sort -count",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "user"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 2,
@@ -29,7 +54,30 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for potential security threats. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST status=200\n| rex field=_raw \"password=(?<password>[^&]+)\"\n| eval password_length=length(password)",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "_raw",
+      "method",
+      "status"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 3,
@@ -40,12 +88,33 @@
       "privilege",
       "escalation"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Linux Authentication Logs",
     "description": "Detection template for linux privilege escalation. Review thresholds and field names for your environment.",
     "query": "sourcetype=linux_secure su*\n| where user!=\"root\" AND user!=\"\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Privilege Escalation / Defense Evasion",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "High",
+    "required_fields": [
+      "user"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 4,
@@ -61,7 +130,34 @@
     "log_source": "Linux Authentication Logs",
     "description": "Detection template for ssh brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=linux_secure \"Failed password for\"\n| stats count by src_ip\n| sort -count",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 5,
@@ -77,7 +173,28 @@
     "log_source": "Linux Authentication Logs",
     "description": "Detection template for successful ssh login. Review thresholds and field names for your environment.",
     "query": "sourcetype=linux_secure \"Accepted publickey for\"\n| stats count by src_ip\n| sort -count",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.004",
+    "mitre_name": "SSH",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/004/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 6,
@@ -93,7 +210,30 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for unusual network traffic. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic\n| stats sum(bytes) as total_bytes by src_ip, dest_ip\n| where total_bytes > 1000000",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "dest_ip",
+      "bytes"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 7,
@@ -108,7 +248,28 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for suspicious processes. Review thresholds and field names for your environment.",
     "query": "sourcetype=processes\n| search \"lsass.exe\" OR \"svchost.exe\" OR \"explorer.exe\"\n| stats count by user",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "user"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 8,
@@ -124,7 +285,35 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for general brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_*\n| stats count by clientip, action\n| where action=\"failure\" AND count>=5",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "clientip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 9,
@@ -135,12 +324,34 @@
       "special",
       "privileges"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Windows Event Logs",
     "description": "Detection template for windows special privileges. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4672\n| eval user_account=mvindex(Account_Name,1)",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Privilege Escalation / Defense Evasion",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "Medium",
+    "required_fields": [
+      "Account_Name",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 10,
@@ -156,7 +367,30 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for abnormal user activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=purchase\n| stats count by clientip, user\n| where count > 50",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "clientip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 11,
@@ -172,7 +406,31 @@
     "log_source": "DNS Logs",
     "description": "Detection template for potential dns tunneling. Review thresholds and field names for your environment.",
     "query": "sourcetype=dns\n| stats count by query\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1071.004",
+    "mitre_name": "DNS",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1071/004/",
+    "severity": "Medium",
+    "required_fields": [
+      "query"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review queried domains, query lengths, frequency, and source hosts.",
+      "Compare domains against approved infrastructure and threat intelligence."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "CDNs, security products, or applications generating long/frequent DNS queries"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 12,
@@ -188,7 +446,33 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for suspicious powershell activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\" EventCode=4103\n| eval script_block=_raw",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1059.001",
+    "mitre_name": "PowerShell",
+    "mitre_tactic": "Execution",
+    "mitre_url": "https://attack.mitre.org/techniques/T1059/001/",
+    "severity": "Medium",
+    "required_fields": [
+      "_raw",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete PowerShell command or script block.",
+      "Check for encoded commands, downloads, or suspicious child processes."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Administrative PowerShell scripts",
+      "Software deployment or management tools"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 13,
@@ -199,12 +483,34 @@
       "file",
       "access"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1070.004 - File Deletion",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for unusual file access. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* (action=file_delete OR action=file_rename)\n| stats count by user",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1070.004",
+    "mitre_name": "File Deletion",
+    "mitre_tactic": "Defense Evasion",
+    "mitre_url": "https://attack.mitre.org/techniques/T1070/004/",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 14,
@@ -220,7 +526,31 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for network port scans. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic\n| stats count by src_ip, dest_port\n| where count > 100",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1046",
+    "mitre_name": "Network Service Discovery",
+    "mitre_tactic": "Discovery",
+    "mitre_url": "https://attack.mitre.org/techniques/T1046/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "dest_port"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Authorized vulnerability scanners",
+      "Network monitoring or asset-discovery tools"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 15,
@@ -231,12 +561,33 @@
       "email",
       "activity"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1566 - Phishing",
     "category": "Detection / Investigation",
     "log_source": "Email / Mail Logs",
     "description": "Detection template for suspicious email activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=email\n| search \"phishing\" OR \"malware\" OR \"suspicious link\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1566",
+    "mitre_name": "Phishing",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1566/",
+    "severity": "Medium",
+    "required_fields": [
+      "environment-specific fields"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 16,
@@ -251,7 +602,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for data exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_download\n| stats count by user, dest_ip, dest_port",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "High",
+    "required_fields": [
+      "user",
+      "dest_ip",
+      "dest_port",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 17,
@@ -262,12 +642,33 @@
       "vpn",
       "attempts"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1110 - Brute Force",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for failed vpn attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* VPN AND action=\"failure\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 18,
@@ -278,12 +679,33 @@
       "vpn",
       "attempts"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for successful vpn attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* VPN AND action=\"success\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Initial Access / Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "Medium",
+    "required_fields": [
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 19,
@@ -297,12 +719,35 @@
       "unknown",
       "ips"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for logins from new or unknown ips. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=login\n| stats count by user, src_ip\n| where count=1",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Initial Access / Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 20,
@@ -319,7 +764,32 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for potential sql injection attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST\n| rex field=_raw \"SELECT\\s+(?<query>[^;]+)\"\n| eval query_length=length(query)",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "method",
+      "query"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete HTTP request, URI, source IP, response code, and user agent.",
+      "Check for successful exploitation or follow-on activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 21,
@@ -330,12 +800,34 @@
       "file",
       "extensions"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1105 - Ingress Tool Transfer",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for unusual file extensions. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_upload\n| rex field=file_path \".*\\.(?<ext>[^\\.]+)\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1105",
+    "mitre_name": "Ingress Tool Transfer",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1105/",
+    "severity": "Medium",
+    "required_fields": [
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 22,
@@ -351,7 +843,30 @@
     "log_source": "Email / Mail Logs",
     "description": "Detection template for potential phishing attacks. Review thresholds and field names for your environment.",
     "query": "sourcetype=email\n| search \"password\" OR \"reset\" OR \"verify\" OR \"login\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1566",
+    "mitre_name": "Phishing",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1566/",
+    "severity": "Medium",
+    "required_fields": [
+      "environment-specific fields"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Quarantine the message and related copies.",
+      "Block validated malicious sender/domain/URL indicators."
+    ]
   },
   {
     "number": 23,
@@ -369,7 +884,28 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for traffic to known malicious ips. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic dest_ip=malicious_ip",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "dest_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 24,
@@ -380,12 +916,35 @@
       "login",
       "times"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for unusual login times. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=login\n| eval hour=strftime(_time,\"%H\")\n| stats count by user, hour\n| where count < 3",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Initial Access / Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "Medium",
+    "required_fields": [
+      "_time",
+      "user",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 25,
@@ -402,7 +961,28 @@
     "log_source": "Linux Authentication Logs",
     "description": "Detection template for privilege escalation via sudo. Review thresholds and field names for your environment.",
     "query": "sourcetype=linux_secure \"sudo:\"\n| where user!=\"root\" AND user!=\"\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1548.003",
+    "mitre_name": "Sudo and Sudo Caching",
+    "mitre_tactic": "Privilege Escalation",
+    "mitre_url": "https://attack.mitre.org/techniques/T1548/003/",
+    "severity": "High",
+    "required_fields": [
+      "user"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 26,
@@ -420,7 +1000,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for brute force on specific user. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* user=username AND action=failure\n| stats count by src_ip\n| where count >= 5",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 27,
@@ -431,12 +1040,36 @@
       "dns",
       "requests"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1071.004 - DNS",
     "category": "Detection / Investigation",
     "log_source": "DNS Logs",
     "description": "Detection template for unusual dns requests. Review thresholds and field names for your environment.",
     "query": "sourcetype=dns\n| stats count by query\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1071.004",
+    "mitre_name": "DNS",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1071/004/",
+    "severity": "Medium",
+    "required_fields": [
+      "query"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review queried domains, query lengths, frequency, and source hosts.",
+      "Compare domains against approved infrastructure and threat intelligence."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "CDNs, security products, or applications generating long/frequent DNS queries"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 28,
@@ -452,7 +1085,30 @@
     "log_source": "Email / Mail Logs",
     "description": "Detection template for spear-phishing attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=email\n| search \"CEO\" OR \"CFO\" OR \"Finance\" OR \"Accounting\" OR \"Payment\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1566",
+    "mitre_name": "Phishing",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1566/",
+    "severity": "Medium",
+    "required_fields": [
+      "environment-specific fields"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Quarantine the message and related copies.",
+      "Block validated malicious sender/domain/URL indicators."
+    ]
   },
   {
     "number": 29,
@@ -463,12 +1119,34 @@
       "malware",
       "downloads"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1105 - Ingress Tool Transfer",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for potential malware downloads. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_download\n| rex field=file_path \".*\\.(?<ext>[^\\.]+)\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1105",
+    "mitre_name": "Ingress Tool Transfer",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1105/",
+    "severity": "Medium",
+    "required_fields": [
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 30,
@@ -484,7 +1162,29 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for unusual purchase activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=purchase\n| stats count by user\n| where count > 100",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 31,
@@ -500,7 +1200,29 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for potential ddos attacks. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic\n| stats sum(bytes) as total_bytes by src_ip\n| where total_bytes > 100000000",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1498",
+    "mitre_name": "Network Denial of Service",
+    "mitre_tactic": "Impact",
+    "mitre_url": "https://attack.mitre.org/techniques/T1498/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "bytes"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 32,
@@ -515,7 +1237,33 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for ransomware activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_delete\n| rex field=file_path \".*\\.(?<ext>[^\\.]+)\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1486",
+    "mitre_name": "Data Encrypted for Impact",
+    "mitre_tactic": "Impact",
+    "mitre_url": "https://attack.mitre.org/techniques/T1486/",
+    "severity": "Critical",
+    "required_fields": [
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review affected files, users, and hosts.",
+      "Check for rapid file modification/deletion and suspicious process activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate the affected host.",
+      "Preserve evidence and begin ransomware incident-response procedures."
+    ]
   },
   {
     "number": 33,
@@ -526,12 +1274,35 @@
       "threat",
       "activity"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1567 - Exfiltration Over Web Service",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for insider threat activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_upload\n| stats count by user, file_path\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1567",
+    "mitre_name": "Exfiltration Over Web Service",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1567/",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 34,
@@ -543,12 +1314,34 @@
       "unknown",
       "ips"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for authentication from unknown ips. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=login\n| stats count by src_ip\n| where count >= 5\n| where NOT cidrmatch(\"10.0.0.0/8\",src_ip)",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Initial Access / Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 35,
@@ -566,7 +1359,35 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for brute force on ssh service. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic service=ssh\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "service"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 36,
@@ -583,7 +1404,31 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for ssh from unusual countries. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=login service=ssh\n| iplocation src_ip\n| stats count by Country",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.004",
+    "mitre_name": "SSH",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/004/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action",
+      "service",
+      "Country"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 37,
@@ -599,7 +1444,29 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for cve exploit attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST\n| rex field=_raw \"(?<exploit>CVE-\\d{4}-\\d+)\"\n| stats count by exploit",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "Medium",
+    "required_fields": [
+      "_raw",
+      "method"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 38,
@@ -616,7 +1483,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for targeted user brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* user=username action=failure\n| stats count by src_ip\n| where count >= 5",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 39,
@@ -627,12 +1523,34 @@
       "mitm",
       "activity"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1557 - Adversary-in-the-Middle",
     "category": "Detection / Investigation",
     "log_source": "Network Traffic Logs",
     "description": "Detection template for potential mitm activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic protocol=tcp\n| stats count by dest_ip\n| where count > 100",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1557",
+    "mitre_name": "Adversary-in-the-Middle",
+    "mitre_tactic": "Credential Access / Collection",
+    "mitre_url": "https://attack.mitre.org/techniques/T1557/",
+    "severity": "Medium",
+    "required_fields": [
+      "dest_ip",
+      "protocol"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 40,
@@ -644,12 +1562,40 @@
       "via",
       "upload"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1567 - Exfiltration Over Web Service",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for data exfiltration via upload. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_upload\n| stats count by user, file_path\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1567",
+    "mitre_name": "Exfiltration Over Web Service",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1567/",
+    "severity": "High",
+    "required_fields": [
+      "user",
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 41,
@@ -666,7 +1612,34 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for windows ransomware file activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4663\n| stats count by Object_Name, Account_Name",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1486",
+    "mitre_name": "Data Encrypted for Impact",
+    "mitre_tactic": "Impact",
+    "mitre_url": "https://attack.mitre.org/techniques/T1486/",
+    "severity": "Critical",
+    "required_fields": [
+      "Account_Name",
+      "Object_Name",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review affected files, users, and hosts.",
+      "Check for rapid file modification/deletion and suspicious process activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate the affected host.",
+      "Preserve evidence and begin ransomware incident-response procedures."
+    ]
   },
   {
     "number": 42,
@@ -683,7 +1656,29 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for unusual network traffic patterns. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic\n| stats count by dest_ip, dest_port\n| where count > 100 AND dest_ip!=\"192.168.0.1\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "dest_ip",
+      "dest_port"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 43,
@@ -699,7 +1694,35 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for http brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic protocol=http\n| stats count by src_ip\n| where count >= 50",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "protocol"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 44,
@@ -710,12 +1733,34 @@
       "takeover",
       "attempts"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for account takeover attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=login\n| stats count by user\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Initial Access / Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 45,
@@ -734,7 +1779,32 @@
     "log_source": "DNS Logs",
     "description": "Detection template for dns tunneling - long labels. Review thresholds and field names for your environment.",
     "query": "sourcetype=dns\n| eval query_len=len(query)\n| stats count avg(query_len) as avg_len by src_ip\n| where count > 5 AND avg_len > 50",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1071.004",
+    "mitre_name": "DNS",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1071/004/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "query"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review queried domains, query lengths, frequency, and source hosts.",
+      "Compare domains against approved infrastructure and threat intelligence."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "CDNs, security products, or applications generating long/frequent DNS queries"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 46,
@@ -751,7 +1821,32 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for sql injection on php. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| search _raw=\"*SELECT*\" OR _raw=\"*UNION*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete HTTP request, URI, source IP, response code, and user agent.",
+      "Check for successful exploitation or follow-on activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 47,
@@ -769,7 +1864,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for brute force on specific domain. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* host=example.com action=failure\n| stats count by src_ip\n| where count>=10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action",
+      "host"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 48,
@@ -787,7 +1911,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for brute force on app login. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* uri_path=\"/app/login\" action=failure\n| stats count by src_ip\n| where count>=10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 49,
@@ -803,7 +1956,30 @@
     "log_source": "Email / Mail Logs",
     "description": "Detection template for phishing email attachments. Review thresholds and field names for your environment.",
     "query": "sourcetype=email\n| search attachment=\"*.exe\" OR attachment=\"*.zip\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1566",
+    "mitre_name": "Phishing",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1566/",
+    "severity": "Medium",
+    "required_fields": [
+      "attachment"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Quarantine the message and related copies.",
+      "Block validated malicious sender/domain/URL indicators."
+    ]
   },
   {
     "number": 50,
@@ -819,7 +1995,29 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for vulnerable service exploitation. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic\n| stats count by src_ip, dest_port\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "dest_port"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 51,
@@ -834,7 +2032,32 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for reconnaissance activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=GET\n| stats count by src_ip, uri_path\n| where count > 100",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1046",
+    "mitre_name": "Network Service Discovery",
+    "mitre_tactic": "Discovery",
+    "mitre_url": "https://attack.mitre.org/techniques/T1046/",
+    "severity": "Low",
+    "required_fields": [
+      "src_ip",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Authorized vulnerability scanners",
+      "Network monitoring or asset-discovery tools"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 52,
@@ -849,7 +2072,31 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for xss attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST\n| search _raw=\"*<script*\" OR _raw=\"*javascript:*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "method"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete HTTP request, URI, source IP, response code, and user agent.",
+      "Check for successful exploitation or follow-on activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 53,
@@ -860,12 +2107,34 @@
       "escalation",
       "events"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1548 - Abuse Elevation Control Mechanism",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for privilege escalation events. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=privilege_escalation\n| stats count by user\n| where count > 5",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1548",
+    "mitre_name": "Abuse Elevation Control Mechanism",
+    "mitre_tactic": "Privilege Escalation",
+    "mitre_url": "https://attack.mitre.org/techniques/T1548/",
+    "severity": "High",
+    "required_fields": [
+      "user",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 54,
@@ -876,12 +2145,36 @@
       "application",
       "attacks"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1190 - Exploit Public-Facing Application",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for web application attacks. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST\n| search _raw=\"*sql_injection*\" OR _raw=\"*xss*\" OR _raw=\"*csrf*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "Medium",
+    "required_fields": [
+      "_raw",
+      "method"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete HTTP request, URI, source IP, response code, and user agent.",
+      "Check for successful exploitation or follow-on activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 55,
@@ -897,7 +2190,35 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for smb lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic protocol=tcp dest_port=445\n| stats count by src_ip, dest_ip\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.002",
+    "mitre_name": "SMB/Windows Admin Shares",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/002/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "dest_ip",
+      "dest_port",
+      "protocol"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 56,
@@ -908,12 +2229,34 @@
       "file",
       "changes"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1565.001 - Stored Data Manipulation",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for unauthorized file changes. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_write\n| search file_path=\"*/etc/*\" OR file_path=\"*/var/*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1565.001",
+    "mitre_name": "Stored Data Manipulation",
+    "mitre_tactic": "Impact",
+    "mitre_url": "https://attack.mitre.org/techniques/T1565/001/",
+    "severity": "Medium",
+    "required_fields": [
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 57,
@@ -928,7 +2271,32 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for port scanning. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic protocol=tcp\n| stats dc(dest_port) as unique_ports by src_ip\n| where unique_ports > 20",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1046",
+    "mitre_name": "Network Service Discovery",
+    "mitre_tactic": "Discovery",
+    "mitre_url": "https://attack.mitre.org/techniques/T1046/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "dest_port",
+      "protocol"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Authorized vulnerability scanners",
+      "Network monitoring or asset-discovery tools"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 58,
@@ -944,7 +2312,33 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for malicious powershell downloads. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\" EventCode=4104\n| search ScriptBlockText=\"*DownloadString*\" OR ScriptBlockText=\"*Invoke-WebRequest*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1059.001",
+    "mitre_name": "PowerShell",
+    "mitre_tactic": "Execution",
+    "mitre_url": "https://attack.mitre.org/techniques/T1059/001/",
+    "severity": "Medium",
+    "required_fields": [
+      "ScriptBlockText",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete PowerShell command or script block.",
+      "Check for encoded commands, downloads, or suspicious child processes."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Administrative PowerShell scripts",
+      "Software deployment or management tools"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 59,
@@ -961,7 +2355,32 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for long sql injection queries. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| eval request_len=len(_raw)\n| search _raw=\"*SELECT*\" OR _raw=\"*UNION*\"\n| where request_len > 500",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete HTTP request, URI, source IP, response code, and user agent.",
+      "Check for successful exploitation or follow-on activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 60,
@@ -978,7 +2397,36 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for domain controller brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4625 host=\"DC01\"\n| stats count by src_ip\n| where count>=10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "host",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 61,
@@ -994,7 +2442,28 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for ddos connection count. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic\n| stats count by src_ip\n| where count > 1000",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1498",
+    "mitre_name": "Network Denial of Service",
+    "mitre_tactic": "Impact",
+    "mitre_url": "https://attack.mitre.org/techniques/T1498/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 62,
@@ -1005,12 +2474,34 @@
       "shell",
       "activity"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1505.003 - Web Shell",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for web shell activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=command_execution\n| search _raw=\"*base64_decode*\" OR _raw=\"*eval(*\" OR _raw=\"*gzinflate*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1505.003",
+    "mitre_name": "Web Shell",
+    "mitre_tactic": "Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1505/003/",
+    "severity": "Critical",
+    "required_fields": [
+      "_raw",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 63,
@@ -1027,7 +2518,34 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for cisco asa brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=cisco:asa\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 64,
@@ -1043,7 +2561,29 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for repeated sudo activity. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=\"sudo command\"\n| stats count by user\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1548.003",
+    "mitre_name": "Sudo and Sudo Caching",
+    "mitre_tactic": "Privilege Escalation",
+    "mitre_url": "https://attack.mitre.org/techniques/T1548/003/",
+    "severity": "Medium",
+    "required_fields": [
+      "user",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 65,
@@ -1059,7 +2599,32 @@
     "log_source": "DNS Logs",
     "description": "Detection template for advanced dns tunneling. Review thresholds and field names for your environment.",
     "query": "sourcetype=dns\n| eval query_len=len(query)\n| stats count avg(query_len) as avg_len dc(query) as unique_queries by src_ip\n| where count>50 AND avg_len>50",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1071.004",
+    "mitre_name": "DNS",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1071/004/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "query"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review queried domains, query lengths, frequency, and source hosts.",
+      "Compare domains against approved infrastructure and threat intelligence."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "CDNs, security products, or applications generating long/frequent DNS queries"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 66,
@@ -1075,7 +2640,35 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for rdp lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" (EventCode=4624 OR EventCode=4625) Logon_Type=10\n| stats count by src_ip, Account_Name, EventCode",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.001",
+    "mitre_name": "Remote Desktop Protocol",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/001/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "Account_Name",
+      "Logon_Type",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 67,
@@ -1086,12 +2679,34 @@
       "c2",
       "traffic"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1071 - Application Layer Protocol",
     "category": "Detection / Investigation",
     "log_source": "Network Traffic Logs",
     "description": "Detection template for potential c2 traffic. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic\n| stats count by src_ip, dest_ip\n| where count > 500",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1071",
+    "mitre_name": "Application Layer Protocol",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1071/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "dest_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 68,
@@ -1107,7 +2722,32 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for powershell empire indicators. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\"\n| search _raw=\"*-nop*\" _raw=\"*-w hidden*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1059.001",
+    "mitre_name": "PowerShell",
+    "mitre_tactic": "Execution",
+    "mitre_url": "https://attack.mitre.org/techniques/T1059/001/",
+    "severity": "Medium",
+    "required_fields": [
+      "_raw"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete PowerShell command or script block.",
+      "Check for encoded commands, downloads, or suspicious child processes."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Administrative PowerShell scripts",
+      "Software deployment or management tools"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 69,
@@ -1123,7 +2763,33 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for ransomware file extensions. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_write\n| search file_path=\"*.crypt\" OR file_path=\"*.locky\" OR file_path=\"*.locked\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1486",
+    "mitre_name": "Data Encrypted for Impact",
+    "mitre_tactic": "Impact",
+    "mitre_url": "https://attack.mitre.org/techniques/T1486/",
+    "severity": "Critical",
+    "required_fields": [
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review affected files, users, and hosts.",
+      "Check for rapid file modification/deletion and suspicious process activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate the affected host.",
+      "Preserve evidence and begin ransomware incident-response procedures."
+    ]
   },
   {
     "number": 70,
@@ -1140,7 +2806,29 @@
     "log_source": "Network Traffic Logs",
     "description": "Detection template for traffic from suspicious ip. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic src_ip=10.1.1.1\n| stats count by dest_ip\n| where count > 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "dest_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 71,
@@ -1158,7 +2846,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for web app post brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| stats count by src_ip\n| where count >= 50",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 72,
@@ -1169,12 +2886,34 @@
       "file",
       "access"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1003.008 - /etc/passwd and /etc/shadow",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for sensitive file access. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_read\n| search file_path=\"*/etc/shadow\" OR file_path=\"*/etc/passwd\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1003.008",
+    "mitre_name": "/etc/passwd and /etc/shadow",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1003/008/",
+    "severity": "Medium",
+    "required_fields": [
+      "action",
+      "file_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 73,
@@ -1191,7 +2930,29 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for smb admin share access. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=5140\n| search Share_Name=\"*ADMIN$*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.002",
+    "mitre_name": "SMB/Windows Admin Shares",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/002/",
+    "severity": "Medium",
+    "required_fields": [
+      "Share_Name",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 74,
@@ -1208,7 +2969,35 @@
     "log_source": "Linux Authentication Logs",
     "description": "Detection template for invalid ssh brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=linux_secure action=invalid\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 75,
@@ -1224,7 +3013,32 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for phishing form submissions. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| search form_action=\"http://evilsite.com/login\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1566",
+    "mitre_name": "Phishing",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1566/",
+    "severity": "Medium",
+    "required_fields": [
+      "method",
+      "uri_path",
+      "form_action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Quarantine the message and related copies.",
+      "Block validated malicious sender/domain/URL indicators."
+    ]
   },
   {
     "number": 76,
@@ -1235,12 +3049,37 @@
       "injection",
       "attempts"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1190 - Exploit Public-Facing Application",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for command injection attempts. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"*.php\"\n| search _raw=\"*;cat *\" OR _raw=\"*;ls *\" OR _raw=\"*&& whoami*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1190",
+    "mitre_name": "Exploit Public-Facing Application",
+    "mitre_tactic": "Initial Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1190/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete HTTP request, URI, source IP, response code, and user agent.",
+      "Check for successful exploitation or follow-on activity."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 77,
@@ -1251,12 +3090,37 @@
       "lateral",
       "movement"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1021.006 - Windows Remote Management",
     "category": "Detection / Investigation",
     "log_source": "Windows Event Logs",
     "description": "Detection template for winrm lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Microsoft-Windows-WinRM/Operational\"\n| search _raw=\"*winrs*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.006",
+    "mitre_name": "Windows Remote Management",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/006/",
+    "severity": "High",
+    "required_fields": [
+      "_raw"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 78,
@@ -1273,7 +3137,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for wordpress login brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"*/wp-login.php\"\n| stats count by src_ip\n| where count >= 20",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 79,
@@ -1285,12 +3178,34 @@
       "via",
       "runas"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1134.002 - Create Process with Token",
     "category": "Detection / Investigation",
     "log_source": "Windows Event Logs",
     "description": "Detection template for privilege escalation via runas. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4688\n| search New_Process_Name=\"*\\\\runas.exe\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1134.002",
+    "mitre_name": "Create Process with Token",
+    "mitre_tactic": "Privilege Escalation / Defense Evasion",
+    "mitre_url": "https://attack.mitre.org/techniques/T1134/002/",
+    "severity": "High",
+    "required_fields": [
+      "New_Process_Name",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 80,
@@ -1302,12 +3217,35 @@
       "compromised",
       "host"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1071 - Application Layer Protocol",
     "category": "Detection / Investigation",
     "log_source": "Network Traffic Logs",
     "description": "Detection template for beaconing from compromised host. Review thresholds and field names for your environment.",
     "query": "sourcetype=network_traffic src_ip=10.1.1.1\n| stats count by dest_ip, dest_port\n| where count > 1000",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1071",
+    "mitre_name": "Application Layer Protocol",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1071/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "dest_ip",
+      "dest_port"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 81,
@@ -1324,7 +3262,35 @@
     "log_source": "Linux Authentication Logs",
     "description": "Detection template for failed ssh brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=linux_secure action=failed\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 82,
@@ -1335,12 +3301,39 @@
       "data",
       "exfiltration"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for http data exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_download\n| search uri_path=\"*.zip\" OR uri_path=\"*.rar\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1048.003",
+    "mitre_name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1048/003/",
+    "severity": "High",
+    "required_fields": [
+      "action",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 83,
@@ -1356,7 +3349,32 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for wmi lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Microsoft-Windows-WMI-Activity/Operational\"\n| search Operation=\"ExecQuery\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1047",
+    "mitre_name": "Windows Management Instrumentation",
+    "mitre_tactic": "Execution",
+    "mitre_url": "https://attack.mitre.org/techniques/T1047/",
+    "severity": "High",
+    "required_fields": [
+      "Operation"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 84,
@@ -1372,7 +3390,35 @@
     "log_source": "Database Authentication Logs",
     "description": "Detection template for mssql brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=mssql_access action=failed\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 85,
@@ -1388,7 +3434,33 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for powershell privilege escalation. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Microsoft-Windows-PowerShell/Operational\" EventCode=400\n| search _raw=\"*PowerShell*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1059.001",
+    "mitre_name": "PowerShell",
+    "mitre_tactic": "Execution",
+    "mitre_url": "https://attack.mitre.org/techniques/T1059/001/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the complete PowerShell command or script block.",
+      "Check for encoded commands, downloads, or suspicious child processes."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Administrative PowerShell scripts",
+      "Software deployment or management tools"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 86,
@@ -1405,7 +3477,34 @@
     "log_source": "Email / Mail Logs",
     "description": "Detection template for email account brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=exchangeps\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 87,
@@ -1422,7 +3521,35 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for successful rdp lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4624 Logon_Type=10\n| stats count by src_ip, Account_Name",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.001",
+    "mitre_name": "Remote Desktop Protocol",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/001/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "Account_Name",
+      "Logon_Type",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 88,
@@ -1433,12 +3560,34 @@
       "mssql",
       "authentication"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1078 - Valid Accounts",
     "category": "Detection / Investigation",
     "log_source": "Database Authentication Logs",
     "description": "Detection template for successful mssql authentication. Review thresholds and field names for your environment.",
     "query": "sourcetype=mssql_access action=success\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1078",
+    "mitre_name": "Valid Accounts",
+    "mitre_tactic": "Initial Access / Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1078/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 89,
@@ -1450,12 +3599,39 @@
       "sftp",
       "exfiltration"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1048 - Exfiltration Over Alternative Protocol",
     "category": "Detection / Investigation",
     "log_source": "FTP Logs",
     "description": "Detection template for ftp or sftp exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* action=file_upload\n| search uri_path=\"*/ftp*\" OR uri_path=\"*/sftp*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1048",
+    "mitre_name": "Exfiltration Over Alternative Protocol",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1048/",
+    "severity": "High",
+    "required_fields": [
+      "action",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 90,
@@ -1473,7 +3649,29 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for successful smb admin share access. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=5140\n| search Share_Name=\"*ADMIN$*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.002",
+    "mitre_name": "SMB/Windows Admin Shares",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/002/",
+    "severity": "Medium",
+    "required_fields": [
+      "Share_Name",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 91,
@@ -1489,7 +3687,37 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for rdp brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4625 Logon_Type=10\n| stats count by src_ip, Account_Name\n| where count>=10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "Account_Name",
+      "Logon_Type",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 92,
@@ -1501,12 +3729,35 @@
       "web",
       "attack"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1499.003 - Application Exhaustion Flood",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for high-volume web attack. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST\n| stats count by src_ip, uri_path\n| where count >= 100",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1499.003",
+    "mitre_name": "Application Exhaustion Flood",
+    "mitre_tactic": "Impact",
+    "mitre_url": "https://attack.mitre.org/techniques/T1499/003/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 93,
@@ -1518,12 +3769,38 @@
       "lateral",
       "movement"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1112 - Modify Registry",
     "category": "Detection / Investigation",
     "log_source": "Windows Event Logs",
     "description": "Detection template for remote registry lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4663\n| search Object_Name=\"*\\\\REGISTRY\\\\MACHINE\\\\SOFTWARE*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1112",
+    "mitre_name": "Modify Registry",
+    "mitre_tactic": "Persistence / Defense Evasion",
+    "mitre_url": "https://attack.mitre.org/techniques/T1112/",
+    "severity": "High",
+    "required_fields": [
+      "Object_Name",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 94,
@@ -1540,7 +3817,29 @@
     "log_source": "Linux Authentication Logs",
     "description": "Detection template for linux sudo privilege escalation. Review thresholds and field names for your environment.",
     "query": "sourcetype=linux_secure \"sudo:\"\n| stats count by user, host",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1548.003",
+    "mitre_name": "Sudo and Sudo Caching",
+    "mitre_tactic": "Privilege Escalation",
+    "mitre_url": "https://attack.mitre.org/techniques/T1548/003/",
+    "severity": "High",
+    "required_fields": [
+      "user",
+      "host"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 95,
@@ -1556,7 +3855,35 @@
     "log_source": "DNS Logs",
     "description": "Detection template for dns data exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=dns query_type=A\n| search NOT query=\"*.google.com\" NOT query=\"*.microsoft.com\"\n| stats count dc(query) as unique_queries by src_ip",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1071.004",
+    "mitre_name": "DNS",
+    "mitre_tactic": "Command and Control",
+    "mitre_url": "https://attack.mitre.org/techniques/T1071/004/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "query",
+      "query_type"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "CDNs, security products, or applications generating long/frequent DNS queries"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 96,
@@ -1573,7 +3900,33 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for failed smb lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=5152\n| search _raw=\"*ADMIN$*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.002",
+    "mitre_name": "SMB/Windows Admin Shares",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/002/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 97,
@@ -1590,7 +3943,35 @@
     "log_source": "Database Authentication Logs",
     "description": "Detection template for failed mssql brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=mssql_access action=failed\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 98,
@@ -1601,12 +3982,39 @@
       "data",
       "exfiltration"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol",
     "category": "Detection / Investigation",
     "log_source": "Email / Mail Logs",
     "description": "Detection template for smtp data exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=smtp action=send_message\n| search NOT recipient=\"*@gmail.com\" NOT recipient=\"*@yahoo.com\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1048.003",
+    "mitre_name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1048/003/",
+    "severity": "High",
+    "required_fields": [
+      "action",
+      "recipient"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 99,
@@ -1622,7 +4030,33 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for netbios lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:System\" EventCode=5719\n| search _raw=\"*No Domain Controller is available*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "N/A",
+    "mitre_name": "Environment Dependent",
+    "mitre_tactic": "Environment Dependent",
+    "mitre_url": "N/A",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 100,
@@ -1638,7 +4072,35 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for telnet brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* uri_path=\"*/telnet\"\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 101,
@@ -1649,12 +4111,39 @@
       "data",
       "exfiltration"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol",
     "category": "Detection / Investigation",
     "log_source": "FTP Logs",
     "description": "Detection template for ftp data exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=ftp action=putfile\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1048.003",
+    "mitre_name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1048/003/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 102,
@@ -1671,7 +4160,33 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for failed wmi lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=5605\n| search Object_Name=\"*\\\\ROOT\\\\CIMV2*\" AND User!=\"SYSTEM\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1047",
+    "mitre_name": "Windows Management Instrumentation",
+    "mitre_tactic": "Execution",
+    "mitre_url": "https://attack.mitre.org/techniques/T1047/",
+    "severity": "High",
+    "required_fields": [
+      "Object_Name",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 103,
@@ -1688,7 +4203,36 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for ssh endpoint brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"*/ssh\"\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 104,
@@ -1700,12 +4244,34 @@
       "privilege",
       "escalation"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1543.003 - Windows Service",
     "category": "Detection / Investigation",
     "log_source": "Windows Event Logs",
     "description": "Detection template for service configuration privilege escalation. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" (EventCode=4697 OR EventCode=7045)\n| search Image_Path=\"*\\\\System32\\\\*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1543.003",
+    "mitre_name": "Windows Service",
+    "mitre_tactic": "Persistence / Privilege Escalation",
+    "mitre_url": "https://attack.mitre.org/techniques/T1543/003/",
+    "severity": "High",
+    "required_fields": [
+      "EventCode",
+      "Image_Path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 105,
@@ -1721,7 +4287,34 @@
     "log_source": "Application / Access Logs",
     "description": "Detection template for snmp brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=snmptrap\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 106,
@@ -1733,12 +4326,40 @@
       "data",
       "exfiltration"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for http upload data exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=access_* method=POST uri_path=\"/upload\"\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1048.003",
+    "mitre_name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1048/003/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "method",
+      "uri_path"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   },
   {
     "number": 107,
@@ -1750,12 +4371,38 @@
       "lateral",
       "movement"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1021.003 - Distributed Component Object Model",
     "category": "Detection / Investigation",
     "log_source": "Windows Event Logs",
     "description": "Detection template for failed dcom lateral movement. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:System\" EventCode=10009\n| search _raw=\"*DCOM was unable to communicate*\"",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1021.003",
+    "mitre_name": "Distributed Component Object Model",
+    "mitre_tactic": "Lateral Movement",
+    "mitre_url": "https://attack.mitre.org/techniques/T1021/003/",
+    "severity": "High",
+    "required_fields": [
+      "_raw",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify the source host, destination host, and account used.",
+      "Check for preceding credential theft or privilege escalation."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Isolate affected endpoints if compromise is confirmed.",
+      "Reset compromised credentials and review adjacent systems."
+    ]
   },
   {
     "number": 108,
@@ -1771,7 +4418,35 @@
     "log_source": "Database Authentication Logs",
     "description": "Detection template for mysql brute force. Review thresholds and field names for your environment.",
     "query": "sourcetype=mysql_access action=failed\n| stats count by src_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1110",
+    "mitre_name": "Brute Force",
+    "mitre_tactic": "Credential Access",
+    "mitre_url": "https://attack.mitre.org/techniques/T1110/",
+    "severity": "Medium",
+    "required_fields": [
+      "src_ip",
+      "action"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Identify targeted accounts and source IPs.",
+      "Check whether a successful login followed the failures."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Users repeatedly entering an incorrect password",
+      "Services using expired or stale credentials"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Block or rate-limit the offending source if appropriate.",
+      "Protect or reset the targeted account if compromise is suspected."
+    ]
   },
   {
     "number": 109,
@@ -1788,7 +4463,30 @@
     "log_source": "Windows Event Logs",
     "description": "Detection template for scheduled task privilege escalation. Review thresholds and field names for your environment.",
     "query": "sourcetype=\"WinEventLog:Security\" EventCode=4698\n| stats count by SubjectUserName, TaskName",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1053.005",
+    "mitre_name": "Scheduled Task",
+    "mitre_tactic": "Privilege Escalation / Persistence",
+    "mitre_url": "https://attack.mitre.org/techniques/T1053/005/",
+    "severity": "High",
+    "required_fields": [
+      "SubjectUserName",
+      "TaskName",
+      "EventCode"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed."
+    ]
   },
   {
     "number": 110,
@@ -1799,11 +4497,39 @@
       "data",
       "exfiltration"
     ],
-    "mitre": "Environment Dependent",
+    "mitre": "T1048.002 - Exfiltration Over Asymmetric Encrypted Non-C2 Protocol",
     "category": "Detection / Investigation",
     "log_source": "Application / Access Logs",
     "description": "Detection template for https data exfiltration. Review thresholds and field names for your environment.",
     "query": "sourcetype=ssl method=POST\n| stats count by src_ip, dest_ip\n| where count >= 10",
-    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation."
+    "notes": "Template: sourcetypes, field names, allowlists, and thresholds may require adaptation.",
+    "mitre_id": "T1048.002",
+    "mitre_name": "Exfiltration Over Asymmetric Encrypted Non-C2 Protocol",
+    "mitre_tactic": "Exfiltration",
+    "mitre_url": "https://attack.mitre.org/techniques/T1048/002/",
+    "severity": "High",
+    "required_fields": [
+      "src_ip",
+      "dest_ip",
+      "method"
+    ],
+    "investigation": [
+      "Confirm the activity is not expected or authorized.",
+      "Review the source, destination, user, host, and timestamp fields available in the matching events.",
+      "Pivot to related events before and after the detection time.",
+      "Review the volume and destination of transferred data.",
+      "Determine whether the destination and transfer are approved."
+    ],
+    "false_positives": [
+      "Legitimate administrative activity",
+      "Application or logging behavior specific to the environment",
+      "Backups, cloud synchronization, or approved bulk transfers"
+    ],
+    "response": [
+      "Validate the alert and document the evidence.",
+      "Escalate according to the SOC playbook if malicious activity is confirmed.",
+      "Contain the affected account or host.",
+      "Block unauthorized destinations and preserve transfer evidence."
+    ]
   }
 ]
