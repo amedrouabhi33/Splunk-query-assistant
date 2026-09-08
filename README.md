@@ -39,13 +39,19 @@ python main.py
 
 ## 🧭 Available Commands
 
-| Command       | Description                    |
-| ------------- | ------------------------------ |
-| 🔢 `1-110`    | Open a Splunk query by number  |
-| 🔎 `search`   | Search the query library       |
-| 🔑 `keywords` | Display common search keywords |
-| 📚 `list`     | Display the full query library |
-| 🚪 `exit`     | Exit the application           |
+The Splunk Query Assistant provides an interactive command-line interface for searching and exploring **110 SOC detection queries** with MITRE ATT&CK context.
+
+| Command | Description |
+|---|---|
+| 🔢 `1-110` | Open a detection by query number |
+| 🔎 `search` | Search by attack name, keyword, log source, MITRE technique, or detection type |
+| 🛡️ `mitre` | Search detections by MITRE ATT&CK technique ID |
+| 📚 `list` | Display the complete Splunk detection library |
+| 🚪 `exit` | Exit the application |
+
+### 🔢 Search by Query Number
+
+Enter a number from `1` to `110`:
 
 ## 🔍 Search by Keyword
 
